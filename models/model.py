@@ -51,6 +51,14 @@ class Offer(db.Model):  # type: ignore
     user = relationship('User', back_populates='offers')
     order = relationship('Order', back_populates='offers')
 
+    @property
+    def serialized(self):
+        return {
+            "id": self.id,
+            "executor_id": self.executor_id,
+            "order_id": self.order_id,
+        }
+
     def __repr__(self):
         return f'<Offer id:{self.id} user_id:{self.executor_id} />'
 
@@ -80,6 +88,8 @@ class Order(db.Model):  # type: ignore
     def serialized(self):
         return {
             "id": self.id,
+            "customer_id": self.customer_id,
+            "executor_id": self.executor_id,
             "first_name": self.name,
             "description": self.description,
             "start_date": self.start_date,
