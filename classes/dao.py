@@ -10,27 +10,43 @@ class Dao(Generic[T]):
 
     @property
     def db(self):
-        return db
+        return self.__db
     
     @property
     def db_session(self):
-        return db.session
+        return self.db.session
 
     @property
     def query(self):
         return self.__query
 
+    def start_session(self):
+        self.db_session.close()
+        self.db_session.begin()
+
     def add_to_db(self, data):
-        db.session.begin()
+        self.start_session()
 
         try:
-            db.session.add(data)
+            self.db_session.add(data)
         except Exception as e:
-            db.session.rollback()
-            logging.exception(f'Rollback transaction {data}')
+            self.db_session.rollback()
+            logging.exception(f'Rollback add data transaction {data}')
             raise
         else:
-            db.session.commit()
+            self.db_session.commit()
+    
+    def delete_from_db(self, data):
+        self.start_session()
+
+        try:
+            self.db_session.delete(data)
+        except Exception as e:
+            self.db_session.rollback()
+            logging.exception(f'Rollback delete transaction {data}')
+            raise
+        else:
+            self.db_session.commit()
     
     def clear_query(self):
         self.__query = None

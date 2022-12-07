@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from .dao.user_dao import UserDao
 import logging
+from classes.exception import NotFoundError
 
 users_blueprint = Blueprint('users', __name__, url_prefix='/api/v1/users')
 user_dao = UserDao()
@@ -29,12 +30,28 @@ def create_user():
     try:
         user = user_dao.create_user(data)
 
-        logging.info(f'succesfulle create_user {user}')
-        
+        logging.info(f'succesfully create_user {user}')
+
         return jsonify(user.serialized)
     except TypeError as e:
         logging.exception('create_user failed')
-        return jsonify({'message': str(e)})
+        return jsonify({'message': str(e)}), 400
     except ValueError as e:
         logging.exception('create_user failed')
-        return jsonify({'message': str(e)})
+        return jsonify({'message': str(e)}), 400
+
+@users_blueprint.route('/<int:id>/', methods=['DELETE'])
+def delete_user(id: int):
+    try:
+        user_dao.delete_user(id)
+        logging.info(f'succesfully delete_user id:{id}')
+
+        return jsonify({'message': 'success'})
+    except TypeError as e:
+        logging.exception(f'delete user failed id:{id}')
+
+        return jsonify({'message': str(e)}), 400
+    except NotFoundError as e:
+        logging.exception(f'delete user failed not found id: {id}')
+
+        return jsonify({'message': str(e)}), 404

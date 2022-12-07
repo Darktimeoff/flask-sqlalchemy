@@ -1,6 +1,6 @@
 from models.model import User, Role
 from classes.dao import Dao
-
+from classes.exception import NotFoundError
 
 class UserDao(Dao):
     def set_query(self):
@@ -50,4 +50,19 @@ class UserDao(Dao):
         self.add_to_db(user)
 
         return user
+    
+    def delete_user(self, id: int) -> True:
+        if type(id) is not int:
+            raise TypeError(f'Uncorrect type of id')
+        
+        self.set_query()
+
+        user = self.__query.get(id)
+
+        if not user:
+            raise NotFoundError(f'User with this id: {id} doesn`t exist')
+
+        self.delete_from_db(user)
+        
+        return True
 
