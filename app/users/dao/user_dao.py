@@ -66,3 +66,33 @@ class UserDao(Dao):
         
         return True
 
+    def update_user(self, id: int, data: dict) -> dict | None:
+        if type(id) is not int:
+            raise TypeError(f'Uncorrect type of id')
+
+        if type(data) is not dict:
+            raise TypeError(f'Uncorrect type of data')
+        
+        data_keys =  set(data.keys())
+
+        if data_keys != self.keys:
+            raise ValueError(f'Uncorrect data for update, need to define {self.keys.difference(data_keys)}')
+
+        self.set_query()
+
+        user = self.__query.get(id)
+
+        if not user:
+            raise NotFoundError(f'User with this id: {id} doesn`t exist')
+
+ 
+        user.first_name = data['first_name']
+        user.last_name = data['last_name']
+        user.age = data['age']
+        user.email = data['email']
+        user.role = Role.customer if data['role'] == Role.customer.name else Role.executor
+        user.phone = data['phone']
+
+        self.update_data_in_db(user)
+
+        return user

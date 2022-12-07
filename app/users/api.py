@@ -55,3 +55,25 @@ def delete_user(id: int):
         logging.exception(f'delete user failed not found id: {id}')
 
         return jsonify({'message': str(e)}), 404
+
+@users_blueprint.route('/<int:id>/', methods=['PUT'])
+def update_user(id: int):
+    try:
+        data = request.json
+
+        user = user_dao.update_user(id, data)
+        logging.info(f'succesfully update user id:{id} user: {user}')
+
+        return jsonify({'message': 'success'})
+    except ValueError as e:
+        logging.exception(f'update user failed id:{id}')
+
+        return jsonify({'message': str(e)}), 400
+    except TypeError as e:
+        logging.exception(f'update user failed id:{id}')
+
+        return jsonify({'message': str(e)}), 400
+    except NotFoundError as e:
+        logging.exception(f'delete user failed not found id: {id}')
+
+        return jsonify({'message': str(e)}), 404

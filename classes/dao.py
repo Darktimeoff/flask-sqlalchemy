@@ -11,6 +11,10 @@ class Dao(Generic[T]):
     @property
     def db(self):
         return self.__db
+
+    @property
+    def query(self):
+        return self.__query
     
     @property
     def db_session(self):
@@ -44,6 +48,18 @@ class Dao(Generic[T]):
         except Exception as e:
             self.db_session.rollback()
             logging.exception(f'Rollback delete transaction {data}')
+            raise
+        else:
+            self.db_session.commit()
+    
+    def update_data_in_db(self, data):
+        self.start_session()
+
+        try:
+            self.db_session.add(data)
+        except Exception as e:
+            self.db_session.rollback()
+            logging.exception(f'Rollback update_data_in_db transaction')
             raise
         else:
             self.db_session.commit()
