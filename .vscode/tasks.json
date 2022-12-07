@@ -1,0 +1,47 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Run BACK",
+        "type": "shell",
+        "command": "pipenv run python3 app.py",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new",
+          "group": "develop",
+        },
+      },
+      {
+        "label": "Run TEST",
+        "type": "shell",
+        "command": "pipenv run pytest",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new",
+          "group": "develop",
+        },
+      },
+      {
+        "label": "Run MakeMigration",
+        "type": "shell",
+        "command": "pipenv run flask db migrate -m \"${input:message}\"",
+      },
+      {
+        "label": "Run Migrate",
+        "type": "shell",
+        "command": "pipenv run flask db upgrade",
+      },
+      {
+        "label": "Run Undo Migration",
+        "type": "shell",
+        "command": "pipenv run flask db downgrade",
+      }
+    ],
+    "inputs": [
+      {
+        "id": "message",
+        "type": "promptString",
+        "description": ""
+      }
+    ],
+}
