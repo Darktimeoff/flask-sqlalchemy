@@ -1,4 +1,4 @@
-from models.model import User
+from models.model import User, Role
 from classes.dao import Dao
 
 
@@ -13,6 +13,11 @@ class UserDao(Dao):
 
         return users
 
+    @property
+    def keys(self):
+        return {'first_name', 'last_name', 'age', 'email', 'role', 'phone'}
+        
+
     def get_user(self, id: int) -> dict | None:
         self.set_query()
 
@@ -22,3 +27,27 @@ class UserDao(Dao):
             return None
 
         return user.serialized
+
+
+    def create_user(self, data: dict) -> dict | None:
+        if type(data) is not dict:
+            raise TypeError(f'Uncorrect type of data')
+        
+        data_keys =  set(data.keys())
+
+        if data_keys != self.keys:
+            raise ValueError(f'Uncorrect data for create, need to define {self.keys.difference(data_keys)}')
+
+        user = User(
+            first_name = data['first_name'],
+            last_name = data['last_name'],
+            age = data['age'],
+            email = data['email'],
+            role = Role.customer if data['role'] == Role.customer.name else Role.executor,
+            phone = data['phone'],
+        )
+
+        self.add_to_db(user)
+
+        return user
+
