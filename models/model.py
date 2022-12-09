@@ -90,7 +90,7 @@ class Order(db.Model):  # type: ignore
             "id": self.id,
             "customer_id": self.customer_id,
             "executor_id": self.executor_id,
-            "first_name": self.name,
+            "name": self.name,
             "description": self.description,
             "start_date": self.start_date,
             "end_date": self.end_date,
