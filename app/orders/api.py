@@ -9,19 +9,31 @@ order_dao = OrderDao()
 
 @orders_blueprint.route('/')
 def get_orders():
-    orders = order_dao.get_orders()
+    try:
+        orders = order_dao.get_orders()
+        logging.info(f'get orders success')
+        return jsonify(orders)
+    except Exception as e:
+        logging.exception(f'get orders unknown error')
 
-    return jsonify(orders)
+        return jsonify({'message': str(e), "status": -1}), 500
 
 
 @orders_blueprint.route('/<int:id>/')
 def get_order(id: int):
-    order = order_dao.get_order(id)
+    try:
+        order = order_dao.get_order(id)
 
-    if not order:
-        return jsonify({'message': 'Order not found'}), 404
+        if not order:
+            logging.info(f'get order error id: {id}')
+            return jsonify({'message': 'Order not found', "status": 1}), 404
 
-    return jsonify(order)
+        logging.info(f'get_order order id: {id} success')
+
+        return jsonify(order)
+    except Exception as e:
+        logging.exception(f'get order unknown error')
+        return jsonify({'message': str(e), "status": -1}), 500
 
 
 @orders_blueprint.route('/', methods=['POST'])
@@ -30,6 +42,9 @@ def create_order():
 
     try:
         order = order_dao.create_order(data)
+
+        logging.info(f'create_order success')
+
         return jsonify(order)
     except TypeError as e:
         logging.exception(f'create order error {data}')
@@ -51,16 +66,19 @@ def update_order(id):
 
     try:
         order = order_dao.update_order(id, data)
+
+        logging.info(f'update_order success')
+
         return jsonify(order)
     except TypeError as e:
         logging.exception(f'update order error id:{id}, body: {data}')
-        return jsonify({'message': str(e), "status": 1})
+        return jsonify({'message': str(e), "status": 1}), 400
     except ValidationDataError as e:
         logging.exception(f'update order error id: {id}, body: {data}')
-        return jsonify({'message': str(e), "status": 2})
+        return jsonify({'message': str(e), "status": 2}), 400
     except NotFoundError as e:
         logging.exception(f'update order error id:{id}, body: {data}')
-        return jsonify({'message': str(e), "status": 3})
+        return jsonify({'message': str(e), "status": 3}), 400
     except Exception as e:
         return jsonify({'message': str(e), "status": -1}), 500
 
@@ -70,12 +88,18 @@ def delete_order(id: int):
     try:
         order_dao.delete_order(id)
 
+        logging.info(f'delete_order success')
+
         return jsonify({'message': 'success'})
     except TypeError as e:
         logging.exception(f'delete order error id: {id}')
 
-        return jsonify({'message': str(e)})
+        return jsonify({'message': str(e), "status": 1}), 400
     except NotFoundError as e:
         logging.exception(f'delete order error id:{id}')
 
-        return jsonify({'message': str(e)})
+        return jsonify({'message': str(e), "status": 2}), 400
+    except Exception as e:
+        logging.exception(f'delete order unknown error id: {id}')
+
+        return jsonify({'message': str(e), "status": -1}), 500
