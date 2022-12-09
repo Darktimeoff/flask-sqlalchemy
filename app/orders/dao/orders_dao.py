@@ -49,7 +49,8 @@ class OrderDao(Dao):
                 f'Uncorrect data for create, need to define {self.order_create_keys.difference(data_keys)}')
 
         if User.query.get(data['customer_id']) is None or User.query.get(data['executor_id']) is None:
-            raise NotFoundError(f'User {data["customer_id"]}-{data["executor_id"]} not found')
+            raise NotFoundError(
+                f'User {data["customer_id"]}-{data["executor_id"]} not found')
 
         self.set_query()
 
@@ -82,7 +83,8 @@ class OrderDao(Dao):
                 f'Uncorrect data for create, need to define {self.order_create_keys.difference(data_keys)}')
 
         if User.query.get(data['customer_id']) is None or User.query.get(data['executor_id']) is None:
-            raise NotFoundError(f'User {data["customer_id"]}-{data["executor_id"]} not found')
+            raise NotFoundError(
+                f'User {data["customer_id"]}-{data["executor_id"]} not found')
 
         self.set_query()
 
