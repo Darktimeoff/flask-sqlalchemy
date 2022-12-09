@@ -9,19 +9,31 @@ offer_dao = OfferDao()
 
 @offers_blueprint.route('/')
 def get_offers():
-    offers = offer_dao.get_offers()
+    try:
+        offers = offer_dao.get_offers()
+        logging.info(f'get_offers success')
+        return jsonify(offers)
+    except Exception as e:
+        logging.exception(f'get_offers unknown error')
 
-    return jsonify(offers)
+        return jsonify({"message": str(e), "status": -1})
 
 
 @offers_blueprint.route('/<int:id>/')
 def get_offer(id: int):
-    offer = offer_dao.get_offer(id)
+    try:
+        offer = offer_dao.get_offer(id)
 
-    if not offer:
-        return jsonify({'message': 'Offer not found'}), 404
+        if not offer:
+            logging.error(f'get_offer error id: {id}')
+            return jsonify({'message': 'Offer not found', "status": 1}), 404
 
-    return jsonify(offer)
+        logging.info(f'get_offer id: {id} success')
+
+        return jsonify(offer)
+    except Exception as e:
+        logging.exception(f'get_offer unknown error id: {id}')
+        return jsonify({'message': str(e), "status": -1})
 
 
 @offers_blueprint.route('/', methods=['POST'])
@@ -30,6 +42,8 @@ def create_offer():
 
     try:
         offer = offer_dao.create_offer(data)
+
+        logging.info(f'create_offer success')
 
         return jsonify(offer)
     except TypeError as e:
@@ -43,7 +57,7 @@ def create_offer():
         return jsonify({'message': str(e), "status": 3})
     except Exception as e:
         logging.exception(f'offer create unknown error data: {data}')
-        return jsonify({'message': str(e), "status": 4})
+        return jsonify({'message': str(e), "status": -1})
 
 
 @offers_blueprint.route('/<int:id>/', methods=['PUT'])
@@ -52,6 +66,8 @@ def update_offer(id: int):
 
     try:
         offer = offer_dao.update_offer(id, offer)
+
+        logging.info(f'update_offer success')
 
         return jsonify(offer)
     except TypeError as e:
@@ -65,13 +81,15 @@ def update_offer(id: int):
         return jsonify({'message': str(e), "status": 3})
     except Exception as e:
         logging.exception(f'update offer unknown error id: {id}, data: {data}')
-        return jsonify({'message': str(e), "status": 4})
+        return jsonify({'message': str(e), "status": -1})
 
 
 @offers_blueprint.route('/<int: id>/', methods=['DELETE'])
 def delete_offer(id: int):
     try:
         offer_dao.delete_offer(id)
+
+        logging.info(f'delete_offer success id: {id}')
 
         return jsonify({"message": "success"})
     except TypeError as e:
